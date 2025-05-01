@@ -9,7 +9,7 @@ import "../../libraries/BN254.sol";
 import "../../interface/IBLSApkRegistry.sol";
 import "./BLSApkRegistryStorage.sol";
 
-contract BLSApkRegistry is Initializable, EIP712, IBLSApkRegistry, OwnableUpgradeable, BLSApkRegistryStorage {
+contract BLSApkRegistry is EIP712, OwnableUpgradeable, BLSApkRegistryStorage {
     using BN254 for BN254.G1Point;
 
     uint256 internal constant PAIRING_EQUALITY_CHECK_GAS = 120000;
@@ -114,7 +114,7 @@ contract BLSApkRegistry is Initializable, EIP712, IBLSApkRegistry, OwnableUpgrad
             referenceBlockNumber < uint32(block.number),
             "BLSApkRegistry.checkSignatures: reference block number must be less than current block number"
         );
-        BN254.G1Point memory signerApk = BN264.G1Point(0, 0);
+        BN254.G1Point memory signerApk = BN254.G1Point(0, 0);
         bytes32[] memory nonSignersPubkeyHashes;
         if (params.nonSignerPubkeys.length > 0) {
             nonSignersPubkeyHashes = new bytes32[](params.nonSignerPubkeys.length);
@@ -132,7 +132,7 @@ contract BLSApkRegistry is Initializable, EIP712, IBLSApkRegistry, OwnableUpgrad
 
         bytes32 signatoryRecordHash = keccak256(abi.encodePacked(referenceBlockNumber, nonSignersPubkeyHashes));
 
-        StakeTotals memory stakeTotals = StakeTotals({totalDappLinkStake: params.totalDappLinkStake, totalBtcStake: params.totalBtcStake});
+        StakeTotals memory stakeTotals = StakeTotals({totalDapplinkStake: params.totalDapplinkStake, totalBtcStake: params.totalBtcStake});
 
         return (stakeTotals, signatoryRecordHash);
     }
@@ -147,7 +147,7 @@ contract BLSApkRegistry is Initializable, EIP712, IBLSApkRegistry, OwnableUpgrad
         BN254.G1Point memory apk,
         BN254.G2Point memory apkG2,
         BN254.G1Point memory sigma
-    ) public view returns (bool, paringSuccessful, bool signatureIsValid) {
+    ) public view returns (bool paringSuccessful, bool signatureIsValid) {
         uint256 gamma = uint256(
             keccak256(
                 abi.encodePacked(
@@ -164,7 +164,7 @@ contract BLSApkRegistry is Initializable, EIP712, IBLSApkRegistry, OwnableUpgrad
             )
         ) % BN254.FR_MODULUS;
 
-        BN254.safePairing(
+        (paringSuccessful, signatureIsValid) = BN254.safePairing(
             sigma.plus(apk.scalar_mul(gamma)), 
             BN254.negGeneratorG2(), 
             BN254.hashToG1(msgHash).plus(BN254.generatorG1().scalar_mul(gamma)),

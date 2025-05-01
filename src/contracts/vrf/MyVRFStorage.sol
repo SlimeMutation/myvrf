@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "../../interface/IBLSApkRegistry.sol";
 
-abstract contract IMyVRFStorage {
+abstract contract MyVRFStorage {
     struct RequestStatus {
         bool fulfilled;
         uint256[] randomWords;

@@ -23,6 +23,6 @@ abstract contract BLSApkRegistryStorage is IBLSApkRegistry, Initializable {
     BN254.G1Point public currentApk;
     ApkUpdate[] public apkHistory;
 
-    mapping(uint256 => bool) public blsRegisterWhitelist;
+    mapping(address => bool) public blsRegisterWhitelist;
 
 }

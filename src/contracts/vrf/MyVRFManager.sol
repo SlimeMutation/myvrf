@@ -39,7 +39,7 @@ contract MyVRFManager is Initializable, OwnableUpgradeable, IMyVRFManager, MyVRF
     }
 
     function fulfillRandomWords(uint256 _requestId, uint256[] memory _randomWords, bytes32 msgHash, uint256 referencedBlockNumber, IBLSApkRegistry.VrfNoSignerAndSignature memory params) external override onlyDapplink {
-        blsRegistry.checkSignature(msgHash, referencedBlockNumber, params);
+        blsRegistry.checkSignatures(msgHash, referencedBlockNumber, params);
         
         requestMapping[_requestId] = RequestStatus({
             randomWords: _randomWords,
